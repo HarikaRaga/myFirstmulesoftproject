@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="9442c436-cf00-4ae0-b2a1-eea6a48636a7" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="choicerouterFlow" doc:id="5942e52a-8b49-4082-805d-c6cf266902ef" >
+		<http:listener doc:name="Listener" doc:id="b9cddfc8-eaf4-44ad-bec0-8a3f0a59d3c3" config-ref="HTTP_Listener_config" path="/Choicerouter"/>
+		<logger level="INFO" doc:name="Logger" doc:id="e85444f3-146a-45d1-afdf-434f795109ea" message="#[payload]"/>
+		<choice doc:name="Choice" doc:id="8e554db8-b2b2-4775-8ee5-9bbd156472d8" >
+			<when expression='#[payload.cityname == "Bang" and payload.state == "KA"]'>
+				<ee:transform doc:name="Transform Message" doc:id="0e182657-ddcc-4920-835c-e080d8a59b37" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"status":"Bang is a part of KA"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<logger level="INFO" doc:name="Logger" doc:id="0ddad929-5bc7-4a25-84c5-c606e4a1a232" message="#[payload]"/>
+			</when>
+			<when expression='#[payload.cityname == "Hyd" and payload.state == "TS"]'>
+				<ee:transform doc:name="Transform Message" doc:id="8b769a44-ae34-4621-94f0-93ec3f0904ae" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"status":"Hyd is a part of TS"
+	
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<when expression='#[payload.cityname == "chennai" and payload.state == "TN"]'>
+				<ee:transform doc:name="Transform Message" doc:id="ad898017-56dc-40d7-bee8-4b3709f2df7b" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"status":"chennai is a part of TN"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise>
+				<ee:transform doc:name="Transform Message" doc:id="7494fa5b-ebb3-4c6d-8270-e21de0582b57" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"status":"Pls choose proper cityname and state"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+	</flow>
+</mule>
